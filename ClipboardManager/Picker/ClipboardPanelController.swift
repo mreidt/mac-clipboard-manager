@@ -22,7 +22,12 @@ final class ClipboardPickerPanel: NSPanel {
     }
 
     private func keyCommand(for event: NSEvent) -> ClipboardPickerKeyCommand? {
-        let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        // Arrow keys may carry `.numericPad` (and `.function`) even when the
+        // user has pressed no meaningful modifier. Ignore those hardware flags
+        // so navigation works for both the main and numeric keyboards.
+        let modifiers = event.modifierFlags
+            .intersection(.deviceIndependentFlagsMask)
+            .subtracting([.numericPad, .function])
         let commandOnly = modifiers == .command
         let noModifiers = modifiers.isEmpty
 
@@ -30,6 +35,8 @@ final class ClipboardPickerPanel: NSPanel {
             switch event.keyCode {
             case 125: return .moveSelection(by: 1)
             case 126: return .moveSelection(by: -1)
+            case 123: return .moveTab(by: -1)
+            case 124: return .moveTab(by: 1)
             case 36, 76: return .copySelected
             case 53: return .close
             default: return nil
@@ -77,7 +84,7 @@ final class ClipboardPanelController: NSObject {
             hide()
         case .focusSearch:
             model.focusSearchToken += 1
-        case .moveSelection, .copySelected, .copyVisible:
+        case .moveSelection, .moveTab, .copySelected, .copyVisible:
             if let entry = model.handle(command) {
                 onSelection?(entry)
                 hide()

@@ -5,6 +5,7 @@ enum ClipboardTab: String, CaseIterable { case recent = "Recent", favorites = "F
 
 enum ClipboardPickerKeyCommand: Equatable {
     case moveSelection(by: Int)
+    case moveTab(by: Int)
     case copySelected
     case close
     case focusSearch
@@ -48,6 +49,12 @@ final class ClipboardPickerViewModel {
     }
 
     func moveSelection(by offset: Int) { guard !filteredEntries.isEmpty else { return }; selectedIndex = min(max(0, (selectedIndex ?? 0) + offset), filteredEntries.count - 1) }
+    func moveTab(by offset: Int) {
+        guard let tabIndex = ClipboardTab.allCases.firstIndex(of: activeTab) else { return }
+        let nextIndex = min(max(0, tabIndex + offset), ClipboardTab.allCases.count - 1)
+        guard nextIndex != tabIndex else { return }
+        activeTab = ClipboardTab.allCases[nextIndex]
+    }
     func selectVisibleIndex(_ index: Int) { guard filteredEntries.indices.contains(index) else { return }; selectedIndex = index }
     func entry(at index: Int) -> ClipboardEntry? { filteredEntries.indices.contains(index) ? filteredEntries[index] : nil }
     func selectedEntry() -> ClipboardEntry? { selectedIndex.flatMap(entry(at:)) }
@@ -58,6 +65,9 @@ final class ClipboardPickerViewModel {
         switch command {
         case let .moveSelection(by: offset):
             moveSelection(by: offset)
+            return nil
+        case let .moveTab(by: offset):
+            moveTab(by: offset)
             return nil
         case .copySelected:
             return selectedEntry()
