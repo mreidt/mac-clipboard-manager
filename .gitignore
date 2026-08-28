@@ -1,0 +1,65 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Xcode user-specific data
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Xcode build output
+DerivedData/
+build/
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Swift Package Manager build output
+.build/
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+
+# Swift Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Code coverage and test output
+*.profraw
+*.profdata
+*.xcresult
+
+# Dependency managers not currently used, kept safe if added later
+Pods/
+Carthage/Build/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+Secrets.xcconfig
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Editor metadata
+.idea/
+.vscode/
+
+# Fastlane generated output, if Fastlane is introduced later
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
+
+# Keep shared Xcode schemes, project files, and SwiftPM lockfile committed.
+!*.xcodeproj/project.pbxproj
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcscheme
+!Package.resolved
