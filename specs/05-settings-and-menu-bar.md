@@ -1,6 +1,6 @@
 # Phase 5 — Settings and Menu Bar
 
-**Status:** NOT STARTED
+**Status:** FINISHED
 
 ## Mandatory instruction
 

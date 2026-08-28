@@ -6,4 +6,12 @@ protocol PasteboardReading: AnyObject {
     func string(forType dataType: NSPasteboard.PasteboardType) -> String?
 }
 
-extension NSPasteboard: PasteboardReading {}
+@MainActor
+protocol PasteboardWriting: AnyObject {
+    @discardableResult
+    func clearContents() -> Int
+    @discardableResult
+    func setString(_ string: String, forType dataType: NSPasteboard.PasteboardType) -> Bool
+}
+
+extension NSPasteboard: PasteboardReading, PasteboardWriting {}
