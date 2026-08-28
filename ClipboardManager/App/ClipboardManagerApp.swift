@@ -7,10 +7,7 @@ struct ClipboardManagerApp: App {
         MenuBarExtra(AppInfo.name, systemImage: "clipboard") {
             MenuBarView(
                 showClipboard: { delegate.picker?.toggle() },
-                showSettings: {
-                    delegate.picker?.hide()
-                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-                }
+                showSettings: { delegate.picker?.hide() }
             )
         }
         Settings {
