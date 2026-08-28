@@ -117,4 +117,3 @@ Version 1 stores text only. Images, files, HTML and rich clipboard formats are i
 ## License
 
 This is a personal project. No public license has been selected.
-
