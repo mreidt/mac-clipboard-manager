@@ -6,7 +6,7 @@ The project is designed as a private personal utility: no accounts, cloud synchr
 
 ## Status
 
-The product and implementation specifications are complete. Application implementation should follow the phases in [`docs/specs/clipboard-manager`](docs/specs/clipboard-manager) in numeric order.
+The product and implementation specifications are complete. Application implementation follows the phases in [`specs`](specs) in numeric order.
 
 ## Core experience
 
@@ -67,36 +67,35 @@ ClipboardManager/
 ├── MenuBar/
 └── Tests/
 
-docs/
-└── specs/
-    └── clipboard-manager/
+specs/
+ClipboardManagerTests/
 ```
 
 ## Specifications
 
 Start with the product contract, then implement one phase at a time:
 
-1. [`00-product-spec.md`](docs/specs/clipboard-manager/00-product-spec.md) — authoritative scope and behavior
-2. [`01-foundation-and-storage.md`](docs/specs/clipboard-manager/01-foundation-and-storage.md) — project shell, SwiftData, repository and settings
-3. [`02-clipboard-monitoring.md`](docs/specs/clipboard-manager/02-clipboard-monitoring.md) — pasteboard observation and deduplication
-4. [`03-picker-interface.md`](docs/specs/clipboard-manager/03-picker-interface.md) — floating panel, Recent, Favorites and search
-5. [`04-keyboard-and-selection.md`](docs/specs/clipboard-manager/04-keyboard-and-selection.md) — global shortcut and keyboard workflow
-6. [`05-settings-and-menu-bar.md`](docs/specs/clipboard-manager/05-settings-and-menu-bar.md) — settings, login item, sound and menu completion
-7. [`06-testing-and-release.md`](docs/specs/clipboard-manager/06-testing-and-release.md) — regression testing and release readiness
+1. [`00-product-spec.md`](specs/00-product-spec.md) — authoritative scope and behavior
+2. [`01-foundation-and-storage.md`](specs/01-foundation-and-storage.md) — project shell, SwiftData, repository and settings
+3. [`02-clipboard-monitoring.md`](specs/02-clipboard-monitoring.md) — pasteboard observation and deduplication
+4. [`03-picker-interface.md`](specs/03-picker-interface.md) — floating panel, Recent, Favorites and search
+5. [`04-keyboard-and-selection.md`](specs/04-keyboard-and-selection.md) — global shortcut and keyboard workflow
+6. [`05-settings-and-menu-bar.md`](specs/05-settings-and-menu-bar.md) — settings, login item, sound and menu completion
+7. [`06-testing-and-release.md`](specs/06-testing-and-release.md) — regression testing and release readiness
 
 Every implementation agent must read `00-product-spec.md` first, complete only its assigned phase, run that phase's checks, report the result, and stop before the next phase.
 
 ## Building
 
-The Xcode project is created during Phase 1. After that phase:
+This repository uses Swift Package Manager. From the repository root:
 
-1. Open `ClipboardManager.xcodeproj` in Xcode.
-2. Select the `ClipboardManager` macOS scheme.
-3. Choose **Product → Build**.
-4. Choose **Product → Test** to run the test suite.
-5. Run the app and find its clipboard icon in the macOS menu bar.
+```sh
+swift build
+swift test
+swift build -c release
+```
 
-If the final project uses an `.xcworkspace` instead of an `.xcodeproj`, open the workspace and keep the remaining steps unchanged.
+The executable is a macOS menu-bar application and can also be opened in Xcode as a Swift package for interactive builds and manual testing.
 
 ## Privacy
 

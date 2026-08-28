@@ -22,6 +22,7 @@ struct ClipboardRowView: View {
                 .buttonStyle(.plain)
                 .help(entry.isFavorite ? "Remove from Favorites" : "Add to Favorites")
                 .accessibilityLabel(entry.isFavorite ? "Remove from Favorites" : "Add to Favorites")
+                .accessibilityHint("Changes favorite status without copying the entry")
         }.frame(height: 54).padding(.horizontal, 12).background(selected ? Color.accentColor.opacity(0.18) : .clear).clipShape(RoundedRectangle(cornerRadius: 8)).contentShape(Rectangle()).onTapGesture(perform: onSelect).accessibilityElement(children: .combine).accessibilityLabel("\(preview), \(entry.isFavorite ? "favorite" : "not favorite")\(index < 10 ? ", shortcut Command \(index)" : "")").accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
