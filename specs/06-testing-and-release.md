@@ -1,5 +1,7 @@
 # Phase 6 — Testing and Release Readiness
 
+**Status:** NOT STARTED
+
 ## Mandatory instruction
 
 Read `00-product-spec.md` first. Confirm Phases 1–5 are complete. This phase fixes defects needed to satisfy existing requirements; it must not add new product features.
@@ -227,4 +229,3 @@ Report:
 4. Manual checklist results, including any untested hardware-dependent items.
 5. Known limitations.
 6. Confirmation that no new feature outside the product spec was added.
-

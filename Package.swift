@@ -7,9 +7,13 @@ let package = Package(
     products: [
         .executable(name: "ClipboardManager", targets: ["ClipboardManager"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/sindresorhus/KeyboardShortcuts", from: "2.4.0")
+    ],
     targets: [
         .executableTarget(
             name: "ClipboardManager",
+            dependencies: ["KeyboardShortcuts"],
             path: "ClipboardManager"
         ),
         .testTarget(

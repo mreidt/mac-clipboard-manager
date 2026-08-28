@@ -1,5 +1,7 @@
 # Phase 3 — Picker Interface
 
+**Status:** FINISHED
+
 ## Mandatory instruction
 
 Read `00-product-spec.md` first. Confirm Phases 1 and 2 are complete. Implement only this phase. Do not register the global shortcut or final keyboard commands yet.
@@ -186,4 +188,3 @@ SwiftUI previews:
 ## Required completion report
 
 Report changed files, test results, manual results, screenshots if available, deviations, and confirmation that Phase 4 was not started.
-

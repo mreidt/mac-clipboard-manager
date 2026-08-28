@@ -104,6 +104,62 @@ final class ClipboardPickerViewModelTests: XCTestCase {
         XCTAssertNil(vm.digitIndex(10))
     }
 
+    func testArrowSelectionStopsAtBothEnds() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        _ = try repo.recordCopiedText("one", historyLimit: 20)
+        _ = try repo.recordCopiedText("two", historyLimit: 20)
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+
+        _ = vm.handle(.moveSelection(by: -1))
+        XCTAssertEqual(vm.selectedIndex, 0)
+        _ = vm.handle(.moveSelection(by: 1))
+        _ = vm.handle(.moveSelection(by: 1))
+        XCTAssertEqual(vm.selectedIndex, 1)
+    }
+
+    func testMissingVisibleIndexDoesNothing() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        _ = try repo.recordCopiedText("only entry", historyLimit: 20)
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+
+        XCTAssertNil(vm.handle(.copyVisible(index: 9)))
+        XCTAssertEqual(vm.selectedIndex, 0)
+    }
+
+    func testCopyCommandUsesFilteredEntry() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        _ = try repo.recordCopiedText("first", historyLimit: 20)
+        let matching = try XCTUnwrap(repo.recordCopiedText("matching second", historyLimit: 20))
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+        vm.searchText = "matching"
+
+        XCTAssertEqual(vm.handle(.copyVisible(index: 0))?.id, matching.id)
+        XCTAssertEqual(vm.handle(.copySelected)?.id, matching.id)
+    }
+
+    func testSelectionDateBehaviorRespectsMoveToTopAndKeepsFavoriteDate() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        let entry = try XCTUnwrap(repo.recordCopiedText("selected", historyLimit: 20))
+        try repo.setFavorite(entryID: entry.id, isFavorite: true)
+        let favoriteDate = entry.favoritedAt
+        let copiedDate = entry.copiedAt
+
+        try repo.markSelected(entryID: entry.id, moveToTop: false)
+        XCTAssertEqual(entry.copiedAt, copiedDate)
+        XCTAssertEqual(entry.favoritedAt, favoriteDate)
+
+        try repo.markSelected(entryID: entry.id, moveToTop: true)
+        XCTAssertGreaterThan(entry.copiedAt, copiedDate)
+        XCTAssertEqual(entry.favoritedAt, favoriteDate)
+    }
+
     private func makeRepository() throws -> (ClipboardRepository, ModelContainer) {
         let container = try ModelContainer(for: ClipboardEntry.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
         return (ClipboardRepository(context: container.mainContext), container)
