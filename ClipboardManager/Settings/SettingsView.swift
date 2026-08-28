@@ -10,7 +10,7 @@ struct SettingsView: View {
         Form {
             Toggle("Launch at login", isOn: Binding(get: { loginItems.isEnabled }, set: { value in do { try loginItems.setEnabled(value) } catch { errorMessage = error.localizedDescription } }))
             Toggle("Play sound when copying", isOn: $settings.playCopySound)
-            Stepper("Entries shown in picker: \(settings.historyLimit)", value: Binding(get: { settings.historyLimit }, set: { settings.historyLimit = $0; try? repository.enforceHistoryLimit($0) }), in: 10...100, step: 5)
+            Stepper("Entries shown in picker: \(settings.historyLimit)", value: $settings.historyLimit, in: 10...100, step: 5)
             Text("Choose between 10 and 100 entries.").font(.caption).foregroundStyle(.secondary)
             HStack { Text("Global shortcut"); Spacer(); Text("⌃ ⇧ Space").font(.system(.body, design: .monospaced)).padding(5).background(.quaternary).clipShape(RoundedRectangle(cornerRadius: 5)) }
             Toggle("Move selected items to the top", isOn: $settings.moveSelectedToTop)
