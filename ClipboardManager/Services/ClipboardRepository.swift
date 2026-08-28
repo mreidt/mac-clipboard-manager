@@ -2,7 +2,14 @@ import Foundation
 import SwiftData
 
 @MainActor
-final class ClipboardRepository {
+protocol ClipboardRepositoryProtocol: AnyObject {
+    @discardableResult
+    func recordCopiedText(_ text: String, historyLimit: Int) throws -> ClipboardEntry?
+    func enforceHistoryLimit(_ limit: Int) throws
+}
+
+@MainActor
+final class ClipboardRepository: ClipboardRepositoryProtocol {
     let context: ModelContext
     init(context: ModelContext) { self.context = context }
 

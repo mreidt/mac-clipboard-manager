@@ -1,5 +1,6 @@
 import AppKit
 
+@MainActor
 protocol PasteboardReading: AnyObject {
     var changeCount: Int { get }
     func string(forType dataType: NSPasteboard.PasteboardType) -> String?
