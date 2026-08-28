@@ -3,6 +3,14 @@ import Observation
 
 enum ClipboardTab: String, CaseIterable { case recent = "Recent", favorites = "Favorites" }
 
+enum ClipboardPickerKeyCommand: Equatable {
+    case moveSelection(by: Int)
+    case copySelected
+    case close
+    case focusSearch
+    case copyVisible(index: Int)
+}
+
 @MainActor
 @Observable
 final class ClipboardPickerViewModel {
@@ -42,6 +50,21 @@ final class ClipboardPickerViewModel {
     func moveSelection(by offset: Int) { guard !filteredEntries.isEmpty else { return }; selectedIndex = min(max(0, (selectedIndex ?? 0) + offset), filteredEntries.count - 1) }
     func selectVisibleIndex(_ index: Int) { guard filteredEntries.indices.contains(index) else { return }; selectedIndex = index }
     func entry(at index: Int) -> ClipboardEntry? { filteredEntries.indices.contains(index) ? filteredEntries[index] : nil }
+    func selectedEntry() -> ClipboardEntry? { selectedIndex.flatMap(entry(at:)) }
     func toggleFavorite(_ entry: ClipboardEntry) { try? repository.setFavorite(entryID: entry.id, isFavorite: !entry.isFavorite); reload() }
     func digitIndex(_ digit: Int) -> Int? { (0...9).contains(digit) ? digit : nil }
+
+    func handle(_ command: ClipboardPickerKeyCommand) -> ClipboardEntry? {
+        switch command {
+        case let .moveSelection(by: offset):
+            moveSelection(by: offset)
+            return nil
+        case .copySelected:
+            return selectedEntry()
+        case let .copyVisible(index):
+            return entry(at: index)
+        case .close, .focusSearch:
+            return nil
+        }
+    }
 }

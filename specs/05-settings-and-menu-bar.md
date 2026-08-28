@@ -1,5 +1,7 @@
 # Phase 5 — Settings and Menu Bar
 
+**Status:** NOT STARTED
+
 ## Mandatory instruction
 
 Read `00-product-spec.md` first. Confirm Phases 1–4 are complete. Implement only Settings, menu-bar completion, launch at login and optional selection sound.
@@ -152,4 +154,3 @@ Test:
 ## Required completion report
 
 Report changed files, tests, manual verification, any system limitations, deviations, and confirmation that Phase 6 was not started.
-

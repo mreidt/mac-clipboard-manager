@@ -1,5 +1,7 @@
 # Phase 1 — Foundation and Storage
 
+**Status:** FINISHED
+
 ## Mandatory instruction
 
 Read `00-product-spec.md` first. Implement only this phase. Build and run all checks below, report the result, and stop. Do not start Phase 2.
@@ -204,4 +206,3 @@ Report:
 3. Test count and result.
 4. Any deviation from this spec.
 5. Confirmation that Phase 2 was not started.
-

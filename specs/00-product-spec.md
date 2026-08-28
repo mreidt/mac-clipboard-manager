@@ -1,5 +1,7 @@
 # Clipboard Manager — Product Specification
 
+**Status:** FINISHED
+
 ## Document role
 
 This is the source of truth for the product. Every implementation phase must comply with this file.
@@ -243,4 +245,3 @@ Version 1 is complete only when:
 5. The complete manual regression checklist passes.
 6. The app works offline and without Accessibility permission.
 7. No required behavior was silently changed.
-

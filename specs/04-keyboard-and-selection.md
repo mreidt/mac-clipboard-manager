@@ -1,5 +1,7 @@
 # Phase 4 — Keyboard and Selection
 
+**Status:** FINISHED
+
 ## Mandatory instruction
 
 Read `00-product-spec.md` first. Confirm Phases 1–3 are complete. Implement only keyboard shortcuts and keyboard selection in this phase.
@@ -148,4 +150,3 @@ From Finder, Safari or TextEdit:
 ## Required completion report
 
 Report dependency version, changed files, tests, full manual shortcut results, deviations, and confirmation that Phase 5 was not started.
-

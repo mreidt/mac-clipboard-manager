@@ -1,5 +1,7 @@
 # Phase 2 — Clipboard Monitoring
 
+**Status:** FINISHED
+
 ## Mandatory instruction
 
 Read `00-product-spec.md` first. Confirm Phase 1 is complete. Implement only this phase, run all checks, report the result, and stop.
@@ -122,4 +124,3 @@ Remove temporary Debug UI before completing the phase. Debug logging guarded by 
 ## Required completion report
 
 Report changed files, automated test results, manual check results, deviations, and confirmation that Phase 3 was not started.
-
