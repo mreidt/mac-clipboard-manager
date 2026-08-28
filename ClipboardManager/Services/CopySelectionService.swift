@@ -9,6 +9,5 @@ final class CopySelectionService {
     func copy(_ entry: ClipboardEntry) {
         NSPasteboard.general.clearContents(); NSPasteboard.general.setString(entry.text, forType: .string); monitor.acknowledgeCurrentChange()
         try? repository.markSelected(entryID: entry.id, moveToTop: settings.moveSelectedToTop)
-        if settings.playCopySound { NSSound(named: NSSound.Name("Pop"))?.play() }
     }
 }

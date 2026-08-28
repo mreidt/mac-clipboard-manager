@@ -3,19 +3,14 @@ import SwiftUI
 
 @MainActor
 final class ClipboardPickerPanel: NSPanel {
-    var commandHandler: ((PanelCommand) -> Void)?
+    var onEscape: (() -> Void)?
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
-    override func performKeyEquivalent(with event: NSEvent) -> Bool {
-        if event.modifierFlags.contains(.command), let digit = Int(event.charactersIgnoringModifiers ?? ""), (0...9).contains(digit) { commandHandler?(.digit(digit)); return true }
-        if event.modifierFlags.contains(.command), event.charactersIgnoringModifiers?.lowercased() == "f" { commandHandler?(.focusSearch); return true }
-        return super.performKeyEquivalent(with: event)
-    }
     override func keyDown(with event: NSEvent) {
-        switch event.keyCode { case 125: commandHandler?(.down); case 126: commandHandler?(.up); case 36: commandHandler?(.returnKey); case 53: commandHandler?(.escape); default: super.keyDown(with: event) }
+        if event.keyCode == 53 { onEscape?(); return }
+        super.keyDown(with: event)
     }
 }
-enum PanelCommand { case up, down, returnKey, escape, digit(Int), focusSearch }
 
 @MainActor
 final class ClipboardPanelController: NSObject {
@@ -29,12 +24,24 @@ final class ClipboardPanelController: NSObject {
     init(model: ClipboardPickerViewModel, settings: AppSettings, monitor: ClipboardMonitor) { self.model = model; self.settings = settings; self.monitor = monitor }
     func show() {
         model.prepareForOpening(); model.isPresented = true; model.focusSearchToken += 1
-        if panel == nil { let p = ClipboardPickerPanel(contentRect: NSRect(x: 0, y: 0, width: 490, height: 500), styleMask: [.borderless], backing: .buffered, defer: false); p.isOpaque = false; p.backgroundColor = .clear; p.level = .floating; p.hidesOnDeactivate = true; p.collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary]; p.contentView = NSHostingView(rootView: ClipboardPickerView(model: model, onSelect: { [weak self] e in self?.onSelection?(e) }, onSettings: { [weak self] in self?.onSettings?() })); p.commandHandler = { [weak self] command in self?.handle(command) }; p.delegate = self; panel = p }
-        panel?.center(); NSApp.activate(ignoringOtherApps: true); panel?.makeKeyAndOrderFront(nil)
+        if panel == nil {
+            let p = ClipboardPickerPanel(contentRect: NSRect(x: 0, y: 0, width: 490, height: 500), styleMask: [.borderless], backing: .buffered, defer: false)
+            p.isOpaque = false; p.backgroundColor = .clear; p.hasShadow = true; p.level = .floating; p.hidesOnDeactivate = true; p.collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary, .transient]
+            p.contentView = NSHostingView(rootView: ClipboardPickerView(model: model, onSelect: { [weak self] e in self?.onSelection?(e) }, onSettings: { [weak self] in self?.onSettings?() }))
+            p.onEscape = { [weak self] in self?.hide() }
+            p.delegate = self; panel = p
+        }
+        centerOnPreferredScreen(); panel?.makeKeyAndOrderFront(nil)
     }
     func hide() { model.isPresented = false; panel?.orderOut(nil) }
     func toggle() { model.isPresented ? hide() : show() }
-    private func handle(_ command: PanelCommand) { switch command { case .up: model.moveSelection(by: -1); case .down: model.moveSelection(by: 1); case .escape: hide(); case .focusSearch: model.focusSearchToken += 1; case .digit(let d): if let i = model.digitIndex(d), let entry = model.entry(at: i) { onSelection?(entry) }; case .returnKey: if let i = model.selectedIndex, let entry = model.entry(at: i) { onSelection?(entry) } } }
+    private func centerOnPreferredScreen() {
+        let mouse = NSEvent.mouseLocation
+        let screen = NSScreen.main ?? NSScreen.screens.first { $0.frame.contains(mouse) } ?? NSScreen.screens.first
+        guard let screen, let panel else { return }
+        let visibleFrame = screen.visibleFrame
+        panel.setFrameOrigin(NSPoint(x: visibleFrame.midX - panel.frame.width / 2, y: visibleFrame.midY - panel.frame.height / 2))
+    }
 }
 
 extension ClipboardPanelController: NSWindowDelegate { func windowDidResignKey(_ notification: Notification) { if model.isPresented { hide() } } }
