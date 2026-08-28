@@ -97,6 +97,15 @@ swift build -c release
 
 The executable is a macOS menu-bar application and can also be opened in Xcode as a Swift package for interactive builds and manual testing.
 
+Convenience Makefile targets are also available:
+
+```sh
+make test       # Debug build, tests, then launch the app
+make release    # Release build, then launch the app
+```
+
+Both launch targets keep running until the app is quit or interrupted with `Ctrl+C`.
+
 ## Privacy
 
 All clipboard entries and preferences remain on the Mac. The app does not require an account, network access, or Accessibility permission.
