@@ -3,7 +3,6 @@ import SwiftUI
 struct MenuBarView: View {
     let showClipboard: () -> Void
     let showSettings: () -> Void
-    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         Text(AppInfo.name)
@@ -12,7 +11,6 @@ struct MenuBarView: View {
         Button("Show Clipboard") { showClipboard() }.keyboardShortcut(" ", modifiers: [.control, .shift])
         Button("Settings…") {
             showSettings()
-            openSettings()
         }
         Button("About \(AppInfo.name)") { showAbout() }
         Divider()

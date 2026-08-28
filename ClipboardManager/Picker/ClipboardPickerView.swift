@@ -3,7 +3,6 @@ import SwiftData
 
 struct ClipboardPickerView: View {
     @Bindable var model: ClipboardPickerViewModel
-    @Environment(\.openSettings) private var openSettings
     @FocusState private var searchFocused: Bool
     let onSelect: (ClipboardEntry) -> Void
     let onSettings: () -> Void
@@ -40,7 +39,7 @@ struct ClipboardPickerView: View {
                 }
             }
             .frame(minHeight: 54, maxHeight: 450)
-            HStack { Text(model.entries.count == 1 ? "1 item" : "\(model.entries.count) items").foregroundStyle(.secondary); Spacer(); Button { onSettings(); openSettings() } label: { Image(systemName: "gearshape").imageScale(.medium) }.buttonStyle(.plain).help("Open Settings").accessibilityLabel("Open Settings").accessibilityHint("Opens Clipboard Manager settings") }.font(.caption)
+            HStack { Text(model.entries.count == 1 ? "1 item" : "\(model.entries.count) items").foregroundStyle(.secondary); Spacer(); Button(action: onSettings) { Image(systemName: "gearshape").imageScale(.medium) }.buttonStyle(.plain).help("Open Settings").accessibilityLabel("Open Settings").accessibilityHint("Opens Clipboard Manager settings") }.font(.caption)
         }.padding(16).frame(width: 490, height: 500).background(.regularMaterial).clipShape(RoundedRectangle(cornerRadius: 16)).environment(\.controlActiveState, .active)
     }
 }
