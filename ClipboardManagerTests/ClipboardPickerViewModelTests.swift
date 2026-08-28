@@ -4,6 +4,108 @@ import SwiftData
 
 @MainActor
 final class ClipboardPickerViewModelTests: XCTestCase {
-    func testSearchAndDigitMapping() throws { let container = try ModelContainer(for: ClipboardEntry.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)); let repo = ClipboardRepository(context: container.mainContext); _ = try repo.recordCopiedText("Hello World", historyLimit: 20); _ = try repo.recordCopiedText("Bonjour", historyLimit: 20); let vm = ClipboardPickerViewModel(repository: repo); vm.prepareForOpening(); vm.searchText = "WORLD"; XCTAssertEqual(vm.filteredEntries.first?.text, "Hello World"); XCTAssertEqual(vm.digitIndex(0), 0); XCTAssertEqual(vm.digitIndex(9), 9); XCTAssertNil(vm.digitIndex(10)) }
-    func testSelectionClamps() throws { let container = try ModelContainer(for: ClipboardEntry.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)); let repo = ClipboardRepository(context: container.mainContext); _ = try repo.recordCopiedText("one", historyLimit: 20); let vm = ClipboardPickerViewModel(repository: repo); vm.prepareForOpening(); vm.selectedIndex = 99; vm.searchText = "one"; XCTAssertEqual(vm.selectedIndex, 0) }
+    func testOpeningResetsToRecentAndSelectsFirstEntry() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        _ = try repo.recordCopiedText("recent", historyLimit: 20)
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.activeTab = .favorites
+        vm.searchText = "stale"
+
+        vm.prepareForOpening()
+
+        XCTAssertEqual(vm.activeTab, .recent)
+        XCTAssertEqual(vm.searchText, "")
+        XCTAssertEqual(vm.selectedIndex, 0)
+        XCTAssertEqual(vm.filteredEntries.map(\.text), ["recent"])
+    }
+
+    func testSearchIsCaseInsensitiveSubstringMatch() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        _ = try repo.recordCopiedText("Hello World", historyLimit: 20)
+        _ = try repo.recordCopiedText("Bonjour", historyLimit: 20)
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+
+        vm.searchText = "WORLD"
+
+        XCTAssertEqual(vm.filteredEntries.map(\.text), ["Hello World"])
+    }
+
+    func testSearchAffectsOnlyTheActiveTab() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        let recent = try XCTUnwrap(repo.recordCopiedText("recent match", historyLimit: 20))
+        let favorite = try XCTUnwrap(repo.recordCopiedText("favorite match", historyLimit: 20))
+        try repo.setFavorite(entryID: favorite.id, isFavorite: true)
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+        vm.searchText = "match"
+
+        XCTAssertEqual(vm.filteredEntries.map(\.text).sorted(), ["favorite match", "recent match"])
+        vm.activeTab = .favorites
+        XCTAssertEqual(vm.filteredEntries.map(\.text), [favorite.text])
+        XCTAssertEqual(recent.isFavorite, false)
+    }
+
+    func testTabChangeResetsSelectionToFirstFilteredResult() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        _ = try repo.recordCopiedText("one", historyLimit: 20)
+        let favorite = try XCTUnwrap(repo.recordCopiedText("two", historyLimit: 20))
+        try repo.setFavorite(entryID: favorite.id, isFavorite: true)
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+        vm.selectedIndex = 1
+
+        vm.activeTab = .favorites
+
+        XCTAssertEqual(vm.selectedIndex, 0)
+        XCTAssertEqual(vm.entry(at: 0)?.text, "two")
+    }
+
+    func testFilteringClampsSelectionAndEmptyResultsHaveNoSelection() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        _ = try repo.recordCopiedText("one", historyLimit: 20)
+        _ = try repo.recordCopiedText("two", historyLimit: 20)
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+        vm.selectedIndex = 99
+        vm.searchText = "two"
+        XCTAssertEqual(vm.selectedIndex, 0)
+
+        vm.searchText = "missing"
+        XCTAssertNil(vm.selectedIndex)
+        XCTAssertTrue(vm.filteredEntries.isEmpty)
+    }
+
+    func testPinningRefreshesResultsWithoutChangingText() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        let entry = try XCTUnwrap(repo.recordCopiedText("keep exact\ntext", historyLimit: 20))
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+
+        vm.toggleFavorite(entry)
+
+        XCTAssertEqual(vm.searchText, "")
+        XCTAssertEqual(vm.activeTab, .recent)
+        XCTAssertEqual(vm.entry(at: 0)?.text, "keep exact\ntext")
+        XCTAssertTrue(try repo.fetchFavorites().contains { $0.text == "keep exact\ntext" })
+    }
+
+    func testDigitToIndexMapsZeroThroughNineDirectly() {
+        let fixture = try! makeRepository()
+        let vm = ClipboardPickerViewModel(repository: fixture.0)
+        for digit in 0...9 { XCTAssertEqual(vm.digitIndex(digit), digit) }
+        XCTAssertNil(vm.digitIndex(-1))
+        XCTAssertNil(vm.digitIndex(10))
+    }
+
+    private func makeRepository() throws -> (ClipboardRepository, ModelContainer) {
+        let container = try ModelContainer(for: ClipboardEntry.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        return (ClipboardRepository(context: container.mainContext), container)
+    }
 }

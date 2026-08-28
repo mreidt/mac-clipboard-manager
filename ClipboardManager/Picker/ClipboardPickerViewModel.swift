@@ -7,7 +7,12 @@ enum ClipboardTab: String, CaseIterable { case recent = "Recent", favorites = "F
 @Observable
 final class ClipboardPickerViewModel {
     let repository: ClipboardRepository
-    var activeTab: ClipboardTab = .recent { didSet { reload() } }
+    var activeTab: ClipboardTab = .recent {
+        didSet {
+            reload()
+            selectedIndex = filteredEntries.isEmpty ? nil : 0
+        }
+    }
     var searchText = "" { didSet { clampSelection() } }
     private(set) var entries: [ClipboardEntry] = []
     private(set) var filteredEntries: [ClipboardEntry] = []
@@ -16,16 +21,24 @@ final class ClipboardPickerViewModel {
     var focusSearchToken = 0
 
     init(repository: ClipboardRepository) { self.repository = repository }
-    func prepareForOpening() { activeTab = .recent; searchText = ""; reload() }
+    func prepareForOpening() {
+        activeTab = .recent
+        searchText = ""
+        reload()
+        selectedIndex = filteredEntries.isEmpty ? nil : 0
+    }
+
     func reload() {
         do { entries = activeTab == .recent ? try repository.fetchRecent() : try repository.fetchFavorites() } catch { entries = [] }
         clampSelection()
     }
+
     func clampSelection() {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let query = searchText.lowercased()
         filteredEntries = query.isEmpty ? entries : entries.filter { $0.text.lowercased().contains(query) }
         if filteredEntries.isEmpty { selectedIndex = nil } else if let selectedIndex { self.selectedIndex = min(max(0, selectedIndex), filteredEntries.count - 1) } else { selectedIndex = 0 }
     }
+
     func moveSelection(by offset: Int) { guard !filteredEntries.isEmpty else { return }; selectedIndex = min(max(0, (selectedIndex ?? 0) + offset), filteredEntries.count - 1) }
     func selectVisibleIndex(_ index: Int) { guard filteredEntries.indices.contains(index) else { return }; selectedIndex = index }
     func entry(at index: Int) -> ClipboardEntry? { filteredEntries.indices.contains(index) ? filteredEntries[index] : nil }
