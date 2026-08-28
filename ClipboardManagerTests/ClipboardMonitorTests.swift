@@ -24,6 +24,7 @@ private final class SpyRepository: ClipboardRepositoryProtocol {
     }
 
     func enforceHistoryLimit(_ limit: Int) throws {}
+    func markSelected(entryID: UUID, moveToTop: Bool) throws {}
 }
 
 @MainActor

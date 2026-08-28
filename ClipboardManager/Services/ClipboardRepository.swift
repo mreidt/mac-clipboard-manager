@@ -6,6 +6,7 @@ protocol ClipboardRepositoryProtocol: AnyObject {
     @discardableResult
     func recordCopiedText(_ text: String, historyLimit: Int) throws -> ClipboardEntry?
     func enforceHistoryLimit(_ limit: Int) throws
+    func markSelected(entryID: UUID, moveToTop: Bool) throws
 }
 
 @MainActor

@@ -10,7 +10,7 @@ struct ClipboardPickerView: View {
     var body: some View {
         VStack(spacing: 12) {
             Text("Clipboard").font(.title3.weight(.semibold)).frame(maxWidth: .infinity, alignment: .leading)
-            Picker("", selection: $model.activeTab) { ForEach(ClipboardTab.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.segmented)
+            Picker("Clipboard section", selection: $model.activeTab) { ForEach(ClipboardTab.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.segmented)
             TextField("Search clipboard", text: $model.searchText)
                 .textFieldStyle(.roundedBorder)
                 .focused($searchFocused)
@@ -39,7 +39,7 @@ struct ClipboardPickerView: View {
                 }
             }
             .frame(minHeight: 54, maxHeight: 450)
-            HStack { Text(model.entries.count == 1 ? "1 item" : "\(model.entries.count) items").foregroundStyle(.secondary); Spacer(); Button(action: onSettings) { Image(systemName: "gearshape").imageScale(.medium) }.buttonStyle(.plain).help("Open Settings").accessibilityLabel("Open Settings") }.font(.caption)
+            HStack { Text(model.entries.count == 1 ? "1 item" : "\(model.entries.count) items").foregroundStyle(.secondary); Spacer(); Button(action: onSettings) { Image(systemName: "gearshape").imageScale(.medium) }.buttonStyle(.plain).help("Open Settings").accessibilityLabel("Open Settings").accessibilityHint("Opens Clipboard Manager settings") }.font(.caption)
         }.padding(16).frame(width: 490, height: 500).background(.regularMaterial).clipShape(RoundedRectangle(cornerRadius: 16)).environment(\.controlActiveState, .active)
     }
 }

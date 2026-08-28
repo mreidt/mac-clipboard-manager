@@ -12,13 +12,13 @@ final class StandardSelectionSoundPlayer: SelectionSoundPlaying {
 
 @MainActor
 final class CopySelectionService {
-    let repository: ClipboardRepository
+    let repository: ClipboardRepositoryProtocol
     let settings: AppSettings
     let monitor: ClipboardMonitor
     private let soundPlayer: SelectionSoundPlaying
     private let pasteboard: PasteboardWriting
 
-    init(repository: ClipboardRepository, settings: AppSettings, monitor: ClipboardMonitor, soundPlayer: SelectionSoundPlaying = StandardSelectionSoundPlayer(), pasteboard: PasteboardWriting = NSPasteboard.general) {
+    init(repository: ClipboardRepositoryProtocol, settings: AppSettings, monitor: ClipboardMonitor, soundPlayer: SelectionSoundPlaying = StandardSelectionSoundPlayer(), pasteboard: PasteboardWriting = NSPasteboard.general) {
         self.repository = repository
         self.settings = settings
         self.monitor = monitor
