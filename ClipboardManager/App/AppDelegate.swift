@@ -19,7 +19,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         do { container = try ModelContainer(for: ClipboardEntry.self) } catch { fatalError("Unable to load model container: \(error)") }
         settings = AppSettings(); repository = ClipboardRepository(context: container.mainContext); monitor = ClipboardMonitor(repository: repository, settings: settings); monitor.start()
         observeHistoryLimitChanges()
-        let model = ClipboardPickerViewModel(repository: repository); picker = ClipboardPanelController(model: model, settings: settings, monitor: monitor); let copyService = CopySelectionService(repository: repository, settings: settings, monitor: monitor); picker.onSelection = { [weak picker] entry in copyService.copy(entry); picker?.hide() }; picker.onSettings = { [weak self] in self?.showSettingsWindow() }
+        let model = ClipboardPickerViewModel(repository: repository)
+        picker = ClipboardPanelController(model: model, settings: settings, monitor: monitor)
+        let soundPlayer = StandardSelectionSoundPlayer()
+        let appSettings = settings
+        let pasteCoordinator = AutomaticPasteCoordinator(
+            repository: repository,
+            settings: settings,
+            monitor: monitor,
+            closePicker: { [weak picker] in picker?.hide() },
+            playSound: { [weak appSettings] in
+                if appSettings?.playCopySound == true { soundPlayer.play() }
+            },
+            onCopyOnlyFallback: {
+                let notification = NSUserNotification()
+                notification.title = "Clipboard Manager"
+                notification.informativeText = "Clipboard Manager copied the item, but macOS Accessibility permission is required to paste it automatically."
+                NSUserNotificationCenter.default.deliver(notification)
+            }
+        )
+        picker.configurePasteCoordinator(pasteCoordinator)
+        picker.onSettings = { [weak self] in self?.showSettingsWindow() }
         globalShortcut = GlobalShortcutManager(onToggle: { [weak self] in self?.picker.toggle() }); globalShortcut.start()
         loginItems = LoginItemManager(settings: settings); loginItems.reconcile()
     }

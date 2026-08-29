@@ -20,7 +20,7 @@ The product and implementation specifications are complete. Application implemen
 - Supports mouse and keyboard navigation.
 - Automatically supports light and dark mode.
 
-Selecting an entry copies it back to the system clipboard. The app does not automatically paste into another application.
+Selecting an entry copies it back to the system clipboard and automatically pastes it into the application that was active before the picker opened when macOS Accessibility permission is available. Without permission, the item remains available for manual `⌘V`.
 
 ## Keyboard controls
 
