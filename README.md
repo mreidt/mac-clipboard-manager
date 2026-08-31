@@ -102,6 +102,8 @@ Convenience Makefile targets are also available:
 ```sh
 make test       # Debug build, tests, then launch the app
 make release    # Release build, then launch the app
+make bundle     # Build ClipboardManager.app in .build
+make install    # Build, sign and install ClipboardManager.app in /Applications
 ```
 
 Both launch targets keep running until the app is quit or interrupted with `Ctrl+C`.

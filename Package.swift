@@ -14,7 +14,8 @@ let package = Package(
         .executableTarget(
             name: "ClipboardManager",
             dependencies: ["KeyboardShortcuts"],
-            path: "ClipboardManager"
+            path: "ClipboardManager",
+            exclude: ["App/Info.plist"]
         ),
         .testTarget(
             name: "ClipboardManagerTests",

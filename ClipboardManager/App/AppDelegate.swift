@@ -16,7 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
-        do { container = try ModelContainer(for: ClipboardEntry.self) } catch { fatalError("Unable to load model container: \(error)") }
+        do { container = try AppDataStore.makeContainer() } catch { fatalError("Unable to load model container: \(error)") }
         settings = AppSettings(); repository = ClipboardRepository(context: container.mainContext); monitor = ClipboardMonitor(repository: repository, settings: settings); monitor.start()
         observeHistoryLimitChanges()
         let model = ClipboardPickerViewModel(repository: repository)
