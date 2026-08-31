@@ -1,8 +1,9 @@
 SWIFT := swift
 APP_NAME := ClipboardManager
-RELEASE_BINARY := .build/arm64-apple-macosx/release/$(APP_NAME)
+APP_BUNDLE := .build/$(APP_NAME).app
+INSTALL_DIR := /Applications
 
-.PHONY: build test release
+.PHONY: build test release bundle install
 
 build:
 	$(SWIFT) build
@@ -14,4 +15,16 @@ test:
 
 release:
 	$(SWIFT) build -c release
-	$(RELEASE_BINARY)
+	$$( $(SWIFT) build -c release --show-bin-path )/$(APP_NAME)
+
+bundle:
+	bin_path=$$($(SWIFT) build -c release --show-bin-path); \
+	mkdir -p "$(APP_BUNDLE)/Contents/MacOS"; \
+	cp "$$bin_path/$(APP_NAME)" "$(APP_BUNDLE)/Contents/MacOS/$(APP_NAME)"; \
+	cp "ClipboardManager/App/Info.plist" "$(APP_BUNDLE)/Contents/Info.plist"; \
+	codesign --force --deep --sign - "$(APP_BUNDLE)"
+
+install: bundle
+	mkdir -p "$(INSTALL_DIR)"; \
+	ditto "$(APP_BUNDLE)" "$(INSTALL_DIR)/$(APP_NAME).app"; \
+	open "$(INSTALL_DIR)/$(APP_NAME).app"
