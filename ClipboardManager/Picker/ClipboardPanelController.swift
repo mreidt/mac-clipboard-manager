@@ -91,7 +91,16 @@ final class ClipboardPanelController: NSObject {
         NSApp.activate(ignoringOtherApps: true)
         centerOnPreferredScreen()
         panel?.orderFrontRegardless()
-        panel?.makeKey()
+        panel?.makeKeyAndOrderFront(nil)
+        DispatchQueue.main.async { [weak self] in
+            guard let self,
+                  self.model.isPresented,
+                  NSApp.isActive,
+                  let panel = self.panel,
+                  panel.isVisible else { return }
+            panel.makeKey()
+            self.model.focusSearchToken += 1
+        }
     }
     func hide() { model.isPresented = false; panel?.orderOut(nil) }
     func toggle() { model.isPresented ? hide() : show() }
