@@ -82,14 +82,16 @@ final class ClipboardPanelController: NSObject {
         model.prepareForOpening(); model.isPresented = true; model.focusSearchToken += 1
         if panel == nil {
             let p = ClipboardPickerPanel(contentRect: NSRect(x: 0, y: 0, width: 490, height: 500), styleMask: [.borderless], backing: .buffered, defer: false)
-            p.isOpaque = false; p.backgroundColor = .clear; p.hasShadow = true; p.level = .floating; p.hidesOnDeactivate = true; p.collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary, .transient]
+            p.isOpaque = false; p.backgroundColor = .clear; p.hasShadow = true; p.level = .floating; p.isFloatingPanel = true; p.becomesKeyOnlyIfNeeded = false; p.hidesOnDeactivate = true; p.collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary, .transient]
             p.contentView = NSHostingView(rootView: ClipboardPickerView(model: model, onSelect: { [weak self] e in self?.select(e) }, onSettings: { [weak self] in self?.onSettings?() }))
             p.onEscape = { [weak self] in self?.hide() }
             p.onKeyCommand = { [weak self] command in self?.handle(command) }
             p.delegate = self; panel = p
         }
         NSApp.activate(ignoringOtherApps: true)
-        centerOnPreferredScreen(); panel?.makeKeyAndOrderFront(nil)
+        centerOnPreferredScreen()
+        panel?.orderFrontRegardless()
+        panel?.makeKey()
     }
     func hide() { model.isPresented = false; panel?.orderOut(nil) }
     func toggle() { model.isPresented ? hide() : show() }
