@@ -25,6 +25,7 @@ bundle:
 	codesign --force --deep --sign - "$(APP_BUNDLE)"
 
 install: bundle
+	-killall "$(APP_NAME)" 2>/dev/null; \
 	mkdir -p "$(INSTALL_DIR)"; \
 	ditto "$(APP_BUNDLE)" "$(INSTALL_DIR)/$(APP_NAME).app"; \
 	open "$(INSTALL_DIR)/$(APP_NAME).app"
