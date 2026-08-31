@@ -119,6 +119,28 @@ final class ClipboardPickerViewModelTests: XCTestCase {
         XCTAssertEqual(vm.selectedIndex, 1)
     }
 
+    func testHorizontalArrowsSwitchTabsAndStopAtBothEnds() throws {
+        let fixture = try makeRepository()
+        let repo = fixture.0
+        let favorite = try XCTUnwrap(repo.recordCopiedText("favorite", historyLimit: 20))
+        try repo.setFavorite(entryID: favorite.id, isFavorite: true)
+        let vm = ClipboardPickerViewModel(repository: repo)
+        vm.prepareForOpening()
+
+        _ = vm.handle(.moveTab(by: -1))
+        XCTAssertEqual(vm.activeTab, .recent)
+
+        _ = vm.handle(.moveTab(by: 1))
+        XCTAssertEqual(vm.activeTab, .favorites)
+        XCTAssertEqual(vm.selectedIndex, 0)
+
+        _ = vm.handle(.moveTab(by: 1))
+        XCTAssertEqual(vm.activeTab, .favorites)
+
+        _ = vm.handle(.moveTab(by: -1))
+        XCTAssertEqual(vm.activeTab, .recent)
+    }
+
     func testMissingVisibleIndexDoesNothing() throws {
         let fixture = try makeRepository()
         let repo = fixture.0
